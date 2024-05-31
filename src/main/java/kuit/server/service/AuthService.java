@@ -37,7 +37,7 @@ public class AuthService {
         }
 
         // TODO: 2. 비밀번호 일치 확인
-        validatePassword(authRequest.getPassword(), userId);
+//        validatePassword(authRequest.getPassword(), userId);
 
         // TODO: 3. JWT 갱신
         String updatedJwt = jwtTokenProvider.createToken(email, userId);

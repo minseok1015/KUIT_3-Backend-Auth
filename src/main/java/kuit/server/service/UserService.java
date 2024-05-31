@@ -1,5 +1,6 @@
 package kuit.server.service;
 
+import kuit.server.common.argument_resolver.PreAuthorizeUser;
 import kuit.server.common.exception.DatabaseException;
 import kuit.server.common.exception.UserException;
 import kuit.server.dao.UserDao;
@@ -74,9 +75,9 @@ public class UserService {
         }
     }
 
-    public List<GetUserResponse> getUsers(String nickname, String email, String status) {
+    public List<GetUserResponse> getUsers(String nickname, String email, String status,Long LastId, int size) {
         log.info("[UserService.getUsers]");
-        return userDao.getUsers(nickname, email, status);
+        return userDao.getUsers(nickname, email, status,LastId,size);
     }
 
     private void validateEmail(String email) {
@@ -91,7 +92,7 @@ public class UserService {
         }
     }
 
-    public PostLoginResponse login(PostLoginRequest postLoginRequest) {
+    public PostLoginResponse login( PostLoginRequest postLoginRequest) {
         log.info("[UserService.login]");
 
 

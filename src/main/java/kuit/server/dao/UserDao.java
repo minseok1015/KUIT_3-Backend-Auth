@@ -73,16 +73,25 @@ public class UserDao {
         return jdbcTemplate.update(sql, param);
     }
 
-    public List<GetUserResponse> getUsers(String nickname, String email, String status) {
-        String sql = "select email, phone_number, nickname, profile_image, status from user ";
+    public List<GetUserResponse> getUsers(String nickname, String email, String status,Long lastId, int size) {
+        String sql = "SELECT id, email, phone_number, nickname, profile_image, status FROM user " +
+                "WHERE (:nickname IS NULL OR nickname LIKE :nickname) " +
+                "AND (:email IS NULL OR email LIKE :email) " +
+                "AND status = :status " +
+                (lastId != null ? "AND id > :lastId " : "") +
+                "ORDER BY id ASC " +
+                "LIMIT :limit";
 
         Map<String, Object> param = Map.of(
                 "nickname", "%" + nickname + "%",
                 "email", "%" + email + "%",
-                "status", status);
+                "status", status,
+                "lastId", lastId,
+                "limit", size);
 
         return jdbcTemplate.query(sql, param,
                 (rs, rowNum) -> new GetUserResponse(
+                        rs.getLong("id"),
                         rs.getString("email"),
                         rs.getString("phone_number"),
                         rs.getString("nickname"),
@@ -92,7 +101,7 @@ public class UserDao {
     }
 
     public long getUserIdByEmail(String email) {
-        String sql = "select user_id from user where email=:email and status='active'";
+        String sql = "select user_id from user where email=:email and status='일반'";
         Map<String, Object> param = Map.of("email", email);
         return jdbcTemplate.queryForObject(sql, param, long.class);
     }
