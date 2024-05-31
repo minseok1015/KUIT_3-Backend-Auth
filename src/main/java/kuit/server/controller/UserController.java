@@ -76,20 +76,21 @@ public class UserController {
     /**
      * 회원 목록 조회
      */
-    @GetMapping("")
+    @GetMapping("/{lastId}/{limit}")
     public BaseResponse<List<GetUserResponse>> getUsers(
-            @RequestParam(required = false, defaultValue = "") String nickname,
-            @RequestParam(required = false, defaultValue = "") String email,
+            @RequestParam(required = false) String nickname,
+            @RequestParam(required = false) String email,
             @RequestParam(required = false, defaultValue = "active") String status,
-            @RequestParam(required = false) Long LastId,
-            @RequestParam( defaultValue = "20") int size
+            @RequestParam(required = false) Long lastId,
+            @RequestParam(required = false, defaultValue = "10") int limit
     ) {
         log.info("[UserController.getUsers]");
         if (!status.equals("active") && !status.equals("dormant") && !status.equals("deleted")) {
             throw new UserException(INVALID_USER_STATUS);
         }
-        return new BaseResponse<>(userService.getUsers(nickname, email, status, LastId, size));
+        return new BaseResponse<>(userService.getUsers(nickname, email, status, lastId, limit));
     }
+
 
     @PostMapping("login")
     public BaseResponse<PostLoginResponse> login(@Validated @RequestBody PostLoginRequest postLoginRequest, BindingResult bindingResult) {

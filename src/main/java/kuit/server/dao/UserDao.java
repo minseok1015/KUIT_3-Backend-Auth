@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,25 +74,24 @@ public class UserDao {
         return jdbcTemplate.update(sql, param);
     }
 
-    public List<GetUserResponse> getUsers(String nickname, String email, String status,Long lastId, int size) {
-        String sql = "SELECT id, email, phone_number, nickname, profile_image, status FROM user " +
-                "WHERE (:nickname IS NULL OR nickname LIKE :nickname) " +
-                "AND (:email IS NULL OR email LIKE :email) " +
-                "AND status = :status " +
-                (lastId != null ? "AND id > :lastId " : "") +
-                "ORDER BY id ASC " +
+    public List<GetUserResponse> getUsers(String nickname, String email, String status, Long lastId, int size) {
+        String sql = "SELECT user_Id, email, phone_number, nickname, profile_image, status " +
+                "FROM user " +
+                "ORDER BY user_Id DESC " +
                 "LIMIT :limit";
 
-        Map<String, Object> param = Map.of(
-                "nickname", "%" + nickname + "%",
-                "email", "%" + email + "%",
-                "status", status,
-                "lastId", lastId,
-                "limit", size);
+        Map<String, Object> param = new HashMap<>();
+        param.put("nickname", nickname != null ? "%" + nickname + "%" : null);
+        param.put("email", email != null ? "%" + email + "%" : null);
+        param.put("status", status);
+        if (lastId != null) {
+            param.put("lastId", lastId);
+        }
+        param.put("limit", size);
 
         return jdbcTemplate.query(sql, param,
                 (rs, rowNum) -> new GetUserResponse(
-                        rs.getLong("id"),
+                        rs.getLong("user_Id"),
                         rs.getString("email"),
                         rs.getString("phone_number"),
                         rs.getString("nickname"),
@@ -99,6 +99,8 @@ public class UserDao {
                         rs.getString("status"))
         );
     }
+
+
 
     public long getUserIdByEmail(String email) {
         String sql = "select user_id from user where email=:email and status='일반'";
