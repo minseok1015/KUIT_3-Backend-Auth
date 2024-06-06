@@ -28,13 +28,13 @@ public class UserDao {
     }
 
     public boolean hasDuplicateEmail(String email) {
-        String sql = "select exists(select email from user where email=:email and status in ('일단', 'deleted'))";
+        String sql = "select exists(select email from User where email=:email and status in ('일단', 'deleted'))";
         Map<String, Object> param = Map.of("email", email);
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, param, boolean.class));
     }
 
     public boolean hasDuplicateNickName(String nickname) {
-        String sql = "select exists(select email from user where nickname=:nickname and status in ('일반', 'deleted'))";
+        String sql = "select exists(select email from User where nickname=:nickname and status in ('일반', 'deleted'))";
         Map<String, Object> param = Map.of("nickname", nickname);
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, param, boolean.class));
     }
@@ -76,7 +76,7 @@ public class UserDao {
 
     public List<GetUserResponse> getUsers(String nickname, String email, String status, Long lastId, int size) {
         String sql = "SELECT user_Id, email, phone_number, nickname, profile_image, status " +
-                "FROM user " +
+                "FROM User " +
                 "ORDER BY user_Id DESC " +
                 "LIMIT :limit";
 
@@ -103,19 +103,19 @@ public class UserDao {
 
 
     public long getUserIdByEmail(String email) {
-        String sql = "select user_id from user where email=:email and status='일반'";
+        String sql = "select user_id from User where email=:email and status='일반'";
         Map<String, Object> param = Map.of("email", email);
         return jdbcTemplate.queryForObject(sql, param, long.class);
     }
 
     public String getPasswordByUserId(long userId) {
-        String sql = "select password from user where user_id=:user_id and status='active'";
+        String sql = "select password from User where user_id=:user_id and status='active'";
         Map<String, Object> param = Map.of("user_id", userId);
         return jdbcTemplate.queryForObject(sql, param, String.class);
     }
 
     public long login(PostLoginRequest postLoginRequest) {
-        String sql = "select user_id from user where email=:email and  status='일반'";
+        String sql = "select user_id from User where email=:email and  status='일반'";
         Map<String, Object> param = Map.of(
                 "email", postLoginRequest.getEmail()
         );
